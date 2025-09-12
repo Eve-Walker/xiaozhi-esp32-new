@@ -16,6 +16,10 @@
 #include "ota.h"
 #include "audio_service.h"
 #include "device_state_event.h"
+// ADC 单次采样所需头文件（尽量少依赖）
+#include <esp_adc/adc_oneshot.h>
+#include <esp_adc/adc_cali.h>
+#include <esp_adc/adc_cali_scheme.h>
 
 #define MAIN_EVENT_SCHEDULE (1 << 0)
 #define MAIN_EVENT_SEND_AUDIO (1 << 1)
@@ -79,6 +83,13 @@ private:
     bool aborted_ = false;
     int clock_ticks_ = 0;
     TaskHandle_t check_new_version_task_handle_ = nullptr;
+
+    // ADC: 最简成员，仅一个unit与两路校准句柄
+    adc_oneshot_unit_handle_t adc1_handle_ = nullptr;
+    adc_cali_handle_t adc1_cali_ch0_ = nullptr;
+    adc_cali_handle_t adc1_cali_ch1_ = nullptr;
+    bool adc1_cali_ch0_enabled_ = false;
+    bool adc1_cali_ch1_enabled_ = false;
 
     void MainEventLoop();
     void OnWakeWordDetected();
